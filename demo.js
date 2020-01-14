@@ -33,9 +33,7 @@ $( document ).ready(function() {
     console.log( "ready!" );
 });
 
-$("#join").click(function() {
-    console.log("join clicked");
-});
+$("#join").click(joinChannel);
 
 $("#leave").click(leaveChannel);
 
