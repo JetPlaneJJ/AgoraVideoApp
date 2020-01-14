@@ -29,9 +29,15 @@ function removeView(id) {
     }
 }
 
-$("join").click(joinChannel);
+$( document ).ready(function() {
+    console.log( "ready!" );
+});
 
-$("leave").click(leaveChannel);
+$("#join").click(function() {
+    console.log("join clicked");
+});
+
+$("#leave").click(leaveChannel);
 
 var rtc = {
     client: null,
