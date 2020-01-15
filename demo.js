@@ -50,7 +50,7 @@ var rtc = {
 var option = {
     appID: "APP_ID",
     channel: "test",
-    uid: null,
+    uid: 0,
     token: "TOKEN"
 };
 
