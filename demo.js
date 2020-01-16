@@ -38,12 +38,12 @@ $("#join").click(joinChannel);
 $("#leave").click(leaveChannel);
 
 var rtc = {
-    client: null,
+    client: null, //The handle for the Agora client
     joined: false,
     published: false,
-    localStream: null,
-    remoteStreams: [],
-    params: {}
+    localStream: null, //Our local video stream
+    remoteStreams: [], //An array of remote video streams
+    params: {} //Any params we may want to pass to Agora
 };
 
 // Options for joining a channel
