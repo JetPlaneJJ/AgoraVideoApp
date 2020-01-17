@@ -48,10 +48,10 @@ var rtc = {
 
 // Options for joining a channel
 var option = {
-    appID: "03c5f1413fe84bd694183a2b7c9b4868",
+    appID: "APP_ID_HERE",
     channel: "test",
     uid: 0,
-    token: "00603c5f1413fe84bd694183a2b7c9b4868IADd5Dr33oOmWXmrUs2s23CrZT6bFLCF2F6Sf0wZ8XHCZgx+f9gAAAAAEADAFXCRCSciXgEAAQAJJyJe"
+    token: "TOKEN"
 };
 
 rtc.client = AgoraRTC.createClient({mode: "rtc", codec: "h264"});
