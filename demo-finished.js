@@ -146,6 +146,7 @@ function leaveChannel() {
 
         while(rtc.remoteStreams.length > 0) {
             var remoteStream = rtc.remoteStreams.shift();
+            var id = remoteStream.getId();
 
             if (remoteStream.isPlaying()) {
                 remoteStream.stop();
