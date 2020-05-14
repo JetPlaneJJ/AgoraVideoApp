@@ -33,10 +33,6 @@ $(document).ready(function () {
   console.log("ready!");
 });
 
-$("#join").click(joinChannel);
-
-$("#leave").click(leaveChannel);
-
 var rtc = {
   client: null, //The handle for the Agora client
   joined: false,
@@ -49,10 +45,14 @@ var rtc = {
 // Options for joining a channel
 var option = {
   appID: "e435e4e68cb94a26900f3fbffee5ef09", // tells agora who you are as a user
-  channel: "JAYS DARK CAVE", // chat rooms
+  channel: "Mystery Room", // chat rooms
   uid: 0, // tells agora "we don't have our own user id, make one for us"
   token: null, // to identify user, security purposes, changed to null for now
 };
+
+// $("#join").click(joinChannel);
+
+$("#leave").click(leaveChannel);
 
 // Create your client
 rtc.client = AgoraRTC.createClient({
@@ -84,8 +84,8 @@ rtc.client.on("stream-added", function (evt) {
 });
 
 rtc.client.on("stream-subscribed", function (evt) {
-  var remoteStream = evt.stream;
-  var id = remoteStream.getId();
+  let remoteStream = evt.stream;
+  let id = remoteStream.getId();
   addView(id);
   remoteStream.play("remote_video_" + id);
   rtc.remoteStreams.push(remoteStream);
@@ -94,8 +94,8 @@ rtc.client.on("stream-subscribed", function (evt) {
 
 // when the stream is added, get the Id and subscribe
 rtc.client.on("stream-removed", function (evt) {
-    var remoteStream = evt.stream;
-    var id = remoteStream.getId();
+    let remoteStream = evt.stream;
+    let id = remoteStream.getId();
     if (remoteStream.isPlaying()) {
         remoteStream.stop();
     }
@@ -106,7 +106,7 @@ rtc.client.on("stream-removed", function (evt) {
 
 // when someone else leaves the call
 rtc.client.on("peer-leave", function(evt) {
-    var id = evt.uid;
+    let id = evt.uid;
     removeView(id);
     rtc.remoteStreams = rtc.remoteStreams.filter(item => item.getId !== id);
     console.log("peer-leave remote-uid ", id);
@@ -114,14 +114,17 @@ rtc.client.on("peer-leave", function(evt) {
 
 /** functions */
 
-function joinChannel() {
-  console.log("Joined rtc channel: " + option.channel);
-  rtc.client.join(option.token, option.channel, option.uid, function (uid) {
+function joinChannel(cname) {
+  console.log("Joined rtc channel: " + cname);
+  // displaying channel name
+  document.getElementById("channel_name").innerHTML = "Current Room Name: " + cname;
+
+  rtc.client.join(option.token, cname, option.uid, function (uid) {
     rtc.params.uid = uid;
     // enable user permissions
     rtc.localStream = AgoraRTC.createStream({
       streamID: rtc.params.uid,
-      audio: false,
+      audio: true,
       video: true,
       screen: false,
     });
@@ -145,6 +148,7 @@ function joinChannel() {
 
 function leaveChannel() {
   console.log("Left channel");
+  document.getElementById("channel_name").innerHTML = "Current Room Name: ";
   rtc.client.leave(
     function () {
       rtc.localStream.stop();
@@ -162,4 +166,15 @@ function leaveChannel() {
       console.error("channel leaving failed ", err);
     }
   );
+}
+
+// switching to having the user enter the channel name
+function onFormSubmit(event) {
+  let cname = document.getElementById("cname").value;
+  if (!cname || cname.length > 10) {
+    alert("Invalid room name. Please try again.")
+    return false;
+  }
+  console.log("form submitted: " + cname);
+  joinChannel(cname);
 }

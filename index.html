@@ -7,37 +7,58 @@
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
-    <title>Basic Communication</title>
+    <title>Cool Video App</title>
     <link rel="stylesheet" href="./assets/common.css" />
   </head>
   <body class="agora-theme">
     <div class="navbar-fixed">
       <nav class="agora-navbar">
         <div class="nav-wrapper agora-primary-bg valign-wrapper">
-          <h5 class="left-align">Basic Communication</h5>
+          <h5 class="left-align" style="font-weight: bold;">
+            Cool Video App
+          </h5>
+          <h6 style="padding-left: 1060px;">
+            Powered by Agora.io
+          </h5>
         </div>
       </nav>
     </div>
-    <div class="row container col l12 s12">
-      <div class="col" style="min-width: 433px; max-width: 443px;">
-        <div class="card" style="margin-top: 0px; margin-bottom: 0px;">
-          <div class="row card-content" style="margin-bottom: 0px;">
-            <div class="row" style="margin: 0;">
-              <div class="col s12">
-                <button
-                  class="btn btn-raised btn-primary waves-effect waves-light"
-                  id="join"
-                >
-                  JOIN
-                </button>
-                <button
-                  class="btn btn-raised btn-primary waves-effect waves-light"
-                  id="leave"
-                >
-                  LEAVE
-                </button>
-              </div>
-            </div>
+    <div class="row container col">
+      <div class="card" style="margin-top: 20px;">
+        <div class="row card-content" style="height: auto;">
+          <div
+            class="col"
+            style="display: flex; margin: 0; align-items: center;"
+          >
+            <h5 id="channel_name">Current Room Name:</h5>
+            <form
+              id="form"
+              onsubmit="onFormSubmit(); return false;"
+              style="margin-right: 60px;"
+            >
+              <input
+                style="margin-left: 30px;"
+                type="text"
+                id="cname"
+                placeholder="Enter Room Name to Join"
+                onsubmit="formSubmitted()"
+              /><br />
+            </form>
+            <button
+              type="submit"
+              onclick="onFormSubmit(); return false;"
+              class="btn btn-raised btn-primary waves-effect waves-light"
+              id="join"
+              style="margin-left: 10px; margin-right: 20px;"
+            >
+              JOIN
+            </button>
+            <button
+              class="btn btn-raised btn-primary waves-effect waves-light"
+              id="leave"
+            >
+              LEAVE
+            </button>
           </div>
         </div>
       </div>
@@ -56,6 +77,6 @@
     <script src="vendor/materialize.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdn.agora.io/sdk/release/AgoraRTCSDK-3.0.0.js"></script>
-    <script src="demo.js"></script>
+    <script src="script.js"></script>
   </body>
 </html>
