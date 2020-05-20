@@ -9,6 +9,7 @@
     />
     <title>Mystery Video App</title>
     <link rel="stylesheet" href="./assets/common.css" />
+    <link rel="stylesheet" href="css/style.css" />
   </head>
   <body class="agora-theme">
     <div class="navbar-fixed">
@@ -23,11 +24,11 @@
         </div>
       </nav>
     </div>
-    <div class="row container col">
+    <!-- Main Content -->
+    <div>
       <div class="card" style="margin-top: 20px;">
         <div class="row card-content" style="height: auto;">
           <div
-            
             style="
               display: flex;
               justify-content: space-between;
@@ -39,16 +40,15 @@
             </span>
             <span>
               <form
-                id="form"
+                id="form" style="width: 200px;"
                 onsubmit="onFormSubmit(); return false;"
-                style="margin-left: 10px;"
               >
                 <input
                   type="text"
                   id="cname"
-                  placeholder="Enter Room to Join"
+                  placeholder="Enter Room Name to Join"
                   onsubmit="formSubmitted()"
-                /><br />
+                />
               </form>
             </span>
             <span>
@@ -72,14 +72,66 @@
           </div>
         </div>
       </div>
-      <div class="col s7">
+      <div style="display: flex;">
         <!-- local stream, will add additional video cells dynamically -->
-        <div class="video-grid" id="video">
+        <div class="video-grid video-container" id="video" style="width: 80%; margin-left: 15px;">
           <div class="video-view">
+            <div id="nickname_container_" class="agora-primary-bg">
+              <h5
+                id = "nickname_"
+                class="left-align"
+              >
+              </h5>
+            </div>
             <div id="local_stream" class="video-placeholder"></div>
             <div id="local_video_info" class="video-profile hide"></div>
             <div id="video_autoplay_local" class="autoplay-fallback hide"></div>
           </div>
+        </div>
+        <!-- Container for share button and chat log -->
+        <div id="chatlog" style="height: 560px">
+          <button
+              type="submit"
+              onclick="shareScreen();"
+              class="btn btn-raised btn-primary waves-effect waves-light"
+              id="share"
+              disabled
+            >
+            Share Your Screen 
+          </button> 
+          <div id="msg_log" style="overflow:scroll; height: 410px;">
+            User12238142: MESSAGES TESTING
+            User12238142: MESSAGES TESTING
+            User12238142: MESSAGES TESTING
+            User12238142: MESSAGES TESTING
+            User12238142: MESSAGES TESTING
+            User12238142: MESSAGES TESTING
+            User12238142: MESSAGES TESTING
+            User12238142: MESSAGES TESTING
+            User12238142: MESSAGES TESTING
+            User12238142: MESSAGES TESTING
+            User12238142: MESSAGES TESTING
+            User12238142: MESSAGES TESTING
+            User12238142: MESSAGES TESTING
+            User12238142: MESSAGES TESTING
+            User12238142: MESSAGES TESTING
+            User12238142: MESSAGES TESTING
+            User12238142: MESSAGES TESTING
+            User12238142: MESSAGES TESTING
+            User12238142: MESSAGES TESTING
+            User12238142: MESSAGES TESTING
+            User12238142: MESSAGES TESTING
+            User12238142: MESSAGES TESTING
+            User12238142: MESSAGES TESTING
+            User12238142: MESSAGES TESTING
+          </div>
+          <form name="message" action="" style="width: 370px; padding-left: 10px;">
+            <input type="text" placeholder="Enter a Message to Send" id="usermsg"/>
+            <button class="btn btn-raised btn-primary waves-effect waves-light" 
+              type="submit" id="submitmsg">
+              Send
+            </button>
+          </form>
         </div>
       </div>
     </div>
@@ -87,6 +139,7 @@
     <script src="vendor/materialize.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdn.agora.io/sdk/release/AgoraRTCSDK-3.0.0.js"></script>
-    <script src="script.js"></script>
+    <script src="assets/agora-rtm-sdk-1.2.2.js"></script>
+    <script src="assets/script.js"></script>
   </body>
 </html>
