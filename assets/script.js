@@ -1,3 +1,34 @@
+/**
+  Name: Jay Lin
+  Last Updated: 05.21.2020  
+  Script for handling Agora's RTM and RTC client as well as other website
+  functionality.
+**/
+
+/** global variables and fields */
+var channel_name = "";
+var username = "";
+// var user_msg_id = Math.floor(Math.random() * 1000000); // for messaging only
+var user_msg_id = "";
+var isSharingScreen = false;
+var rtc = {
+  client: null, //The handle for the Agora client
+  joined: false,
+  published: false,
+  localStream: null, //Our local video stream
+  remoteStreams: [], //An array of remote video streams
+  params: {}, //Any params we may want to pass to Agora
+};
+var RTMchannel; 
+var option = {
+  // Options for joining a channel
+  appID: "e435e4e68cb94a26900f3fbffee5ef09",
+  channel: "Mystery Room", // chat rooms
+  uid: 0, // tells agora "we don't have our own user id, make one for us"
+  token: null, // to identify user, security purposes, changed to null for now
+};
+const RTMclient = AgoraRTM.createInstance("6669f3e9d71b42ed8fabfbc3a2146ba1");
+
 /** Adding views to HTML */
 function addView(id, show) {
   console.log("your id is " + id);
@@ -15,7 +46,7 @@ function addView(id, show) {
     }).appendTo("#remote_video_panel_" + id);
 
     // nickname
-    $("#nickname_container_" + id).append("<h5>" + username + "</h5>");// wrong
+    $("#nickname_container_" + id).append("<h5>" + username + "</h5>"); // wrong
 
     $("<div/>", {
       id: "remote_video_" + id,
@@ -40,37 +71,36 @@ function removeView(id) {
 }
 function addMessageToView(msg, sender) {
   console.log("Message being sent = " + msg);
-  document.getElementById('msg_log').innerHTML += "<h6>" + sender 
-        + ": " + msg + "</h6>";
+  document.getElementById("msg_log").innerHTML +=
+    "<h6>" + sender + ": " + msg + "</h6>";
 }
 
 /** jQuery stuff */
 $(document).ready(function () {
   console.log("ready!");
+  let input = prompt(
+    "Welcome to Mystery Video App!. Please enter your name: ",
+    ""
+  );
+  if (!input || input.length < 1 || input.length > 20) {
+    let randUsername = "USER" + Math.round(1 + Math.random() * 100000);
+    alert("Using random username: " + randUsername);
+    username = randUsername;
+    user_msg_id = username;
+  } else {
+    username = input;
+    user_msg_id = input;
+  }
+  // login as a client of Real time Messaging
+  RTMclient.login({ token: null, uid: "" + user_msg_id })
+    .then(() => {
+      console.log("AgoraRTM client login success: userID = " + user_msg_id);
+    })
+    .catch((err) => {
+      console.log("AgoraRTM client login failure", err);
+    });
 });
 $("#leave").click(leaveChannel);
-
-/** global variables and fields */
-var channel_name = "";
-var username = ""; // user's displayed name
-var user_msg_id = Math.floor(Math.random() * 1000000); // for messaging only
-var isSharingScreen = false;
-var rtc = {
-  client: null, //The handle for the Agora client
-  joined: false,
-  published: false,
-  localStream: null, //Our local video stream
-  remoteStreams: [], //An array of remote video streams
-  params: {}, //Any params we may want to pass to Agora
-};
-var RTMchannel; // placeholder for real-time messaging channel
-var option = { // Options for joining a channel
-  appID: "e435e4e68cb94a26900f3fbffee5ef09", // tells agora who you are as a user
-  channel: "Mystery Room", // chat rooms
-  uid: 0, // tells agora "we don't have our own user id, make one for us"
-  token: null, // to identify user, security purposes, changed to null for now
-};
-const RTMclient = AgoraRTM.createInstance("6669f3e9d71b42ed8fabfbc3a2146ba1"); // YourAppId
 
 /** Real Time Video Client */
 rtc.client = AgoraRTC.createClient({
@@ -88,23 +118,14 @@ rtc.client.init(
   }
 );
 
-/* Real-Time Messaging Client */
+/* Listeners */
 RTMclient.on("ConnectionStateChange", (newState, reason) => {
   console.log(
     "on connection state changed to " + newState + " reason: " + reason
   );
 });
-// login as a client of Real time Messaging
-RTMclient.login({ token: null, uid: "" + user_msg_id})
-.then(() => {
-  console.log("AgoraRTM client login success: userID = " + user_msg_id);
-})
-.catch((err) => {
-  console.log("AgoraRTM client login failure", err);
-});
-
-/* Listeners */
-rtc.client.on("stream-added", function (evt) { // stream added, get the Id, subscribe
+rtc.client.on("stream-added", function (evt) {
+  // stream added, get the Id, subscribe
   let remoteStream = evt.stream;
   let id = remoteStream.getId();
   if (id !== rtc.params.uid) {
@@ -155,13 +176,12 @@ function joinChannel(cname, videoOn) {
   // display channel name, checking if first person or not
   document.getElementById("channel_name").innerHTML =
     "Current Room Name: " + cname;
-  username = prompt("Please enter your name:", "");
-  // this is currently not working for > 1 person
-  document.getElementById("nickname_").innerHTML = username; 
+  document.getElementById("nickname_").innerHTML = username;
 
   rtc.client.join(option.token, channel_name, option.uid, function (uid) {
     rtc.params.uid = uid;
-    rtc.localStream = AgoraRTC.createStream({ // enable user permissions
+    rtc.localStream = AgoraRTC.createStream({
+      // enable user permissions
       streamID: rtc.params.uid,
       audio: !videoOn,
       video: !videoOn,
@@ -188,10 +208,10 @@ function joinChannel(cname, videoOn) {
     })
     .catch((error) => {
       console.log("Failed to Join Messaging Channel.");
-    }); 
+    });
   // when user receives a channel message
   // text: text of the received channel message; senderId: user ID of the sender.
-  RTMchannel.on('ChannelMessage', ({ text }, senderId) => { 
+  RTMchannel.on("ChannelMessage", ({ text }, senderId) => {
     console.log("Message received: " + text);
     console.log("Sender ID = " + senderId);
     addMessageToView(text, senderId);
@@ -199,7 +219,7 @@ function joinChannel(cname, videoOn) {
 }
 
 // when user wants to share their screen
-// turnOn = true, user is currently not sharing screen, turn it on for them
+// turnOn = true, user is currently not sharing screen
 function shareScreen() {
   // if currently sharing screen, switch back to Share Screen
   isSharingScreen
@@ -215,15 +235,17 @@ function shareScreen() {
   leaveChannel();
   setTimeout(() => {
     joinChannel(channel_name, isSharingScreen);
-  }, 3000);
+  }, 1000);
 }
 
 function sendMessage() {
   let msg = document.getElementById("usermsg").value;
-  RTMchannel.sendMessage({ text: msg }).then(() => {
-    addMessageToView(msg, username);
-    }).catch(error => {
-      console.log("Message failed to send.")
+  RTMchannel.sendMessage({ text: msg })
+    .then(() => {
+      addMessageToView(msg, username);
+    })
+    .catch((error) => {
+      console.log("Message failed to send.");
     });
 }
 
@@ -238,8 +260,8 @@ function leaveChannel() {
   document.getElementById("nickname_").innerHTML = "";
 
   // clears the message log
-  document.getElementById('msg_log').innerHTML = "";
-  
+  document.getElementById("msg_log").innerHTML = "";
+
   // leaves the video channel
   rtc.client.leave(
     function () {
@@ -264,7 +286,6 @@ function leaveChannel() {
   console.log("Left Messaging Channel");
 }
 
-// 5/18/20 switching to having the user enter the channel name
 function onFormSubmit() {
   let cname = document.getElementById("cname").value;
   if (!cname || cname.length > 20 || cname.length < 1) {
