@@ -47,7 +47,6 @@
                   type="text"
                   id="cname"
                   placeholder="Enter Room Name to Join"
-                  onsubmit="formSubmitted()"
                 />
               </form>
             </span>
@@ -100,35 +99,22 @@
             Share Your Screen 
           </button> 
           <div id="msg_log" style="overflow:scroll; height: 410px;">
-            User12238142: MESSAGES TESTING
-            User12238142: MESSAGES TESTING
-            User12238142: MESSAGES TESTING
-            User12238142: MESSAGES TESTING
-            User12238142: MESSAGES TESTING
-            User12238142: MESSAGES TESTING
-            User12238142: MESSAGES TESTING
-            User12238142: MESSAGES TESTING
-            User12238142: MESSAGES TESTING
-            User12238142: MESSAGES TESTING
-            User12238142: MESSAGES TESTING
-            User12238142: MESSAGES TESTING
-            User12238142: MESSAGES TESTING
-            User12238142: MESSAGES TESTING
-            User12238142: MESSAGES TESTING
-            User12238142: MESSAGES TESTING
-            User12238142: MESSAGES TESTING
-            User12238142: MESSAGES TESTING
-            User12238142: MESSAGES TESTING
-            User12238142: MESSAGES TESTING
-            User12238142: MESSAGES TESTING
-            User12238142: MESSAGES TESTING
-            User12238142: MESSAGES TESTING
-            User12238142: MESSAGES TESTING
+
           </div>
           <form name="message" action="" style="width: 370px; padding-left: 10px;">
-            <input type="text" placeholder="Enter a Message to Send" id="usermsg"/>
-            <button class="btn btn-raised btn-primary waves-effect waves-light" 
-              type="submit" id="submitmsg">
+            <input type="text" 
+              placeholder="Enter a Message to Send" 
+              id="usermsg"
+              maxlength="50"
+              onsubmit="sendMessage(); return false;"
+              disabled
+              />
+            <button 
+              class="btn btn-raised btn-primary waves-effect waves-light" 
+              type="submit" id="submitmsg"
+              onclick="sendMessage(); return false;"
+              disabled
+              >
               Send
             </button>
           </form>
