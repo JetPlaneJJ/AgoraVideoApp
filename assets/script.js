@@ -7,8 +7,8 @@
 
 /** global variables and fields */
 var channel_name = "";
+var newID = "";
 var username = "";
-// var user_msg_id = Math.floor(Math.random() * 1000000); // for messaging only
 var user_msg_id = "";
 var isSharingScreen = false;
 var rtc = {
@@ -19,7 +19,7 @@ var rtc = {
   remoteStreams: [], //An array of remote video streams
   params: {}, //Any params we may want to pass to Agora
 };
-var RTMchannel; 
+var RTMchannel;
 var option = {
   // Options for joining a channel
   appID: "e435e4e68cb94a26900f3fbffee5ef09",
@@ -31,22 +31,25 @@ const RTMclient = AgoraRTM.createInstance("6669f3e9d71b42ed8fabfbc3a2146ba1");
 
 /** Adding views to HTML */
 function addView(id, show) {
-  console.log("your id is " + id);
+  console.log("id is " + id);
+  let numVid = rtc.remoteStreams.length + 1;
+  console.log("in addView: " + numVid);
   if (!$("#" + id)[0]) {
     // the video itself
-    $("<div/>", {
+    $("<section/>", {
       id: "remote_video_panel_" + id,
       class: "video-view",
     }).appendTo("#video");
 
     // the container upper bar for the name
     $("<div/>", {
-      id: "nickname_container_" + id,
+      id: "nickname_container_" + numVid,
       class: "agora-primary-bg",
     }).appendTo("#remote_video_panel_" + id);
 
-    // nickname
-    $("#nickname_container_" + id).append("<h5>" + username + "</h5>"); // wrong
+    $("<div/>", {
+      id: "nickname_" + id,
+    }).appendTo("#nickname_container_" + id);
 
     $("<div/>", {
       id: "remote_video_" + id,
@@ -79,18 +82,21 @@ function addMessageToView(msg, sender) {
 $(document).ready(function () {
   console.log("ready!");
   let input = prompt(
-    "Welcome to Mystery Video App!. Please enter your name: ",
+    "Welcome to Mystery Video App! Please enter your name: ",
     ""
   );
   if (!input || input.length < 1 || input.length > 20) {
-    let randUsername = "USER" + Math.round(1 + Math.random() * 100000);
-    alert("Using random username: " + randUsername);
-    username = randUsername;
-    user_msg_id = username;
-  } else {
-    username = input;
-    user_msg_id = input;
+    input = "USER" + Math.round(1 + Math.random() * 100000);
+    alert(
+      "Invalid or empty input. Using random username: " +
+        input +
+        ". Refresh the page to change display name."
+    );
   }
+  username = input;
+  user_msg_id = input;
+  document.getElementById("display_name").innerHTML =
+    "Current Display Name: " + input;
   // login as a client of Real time Messaging
   RTMclient.login({ token: null, uid: "" + user_msg_id })
     .then(() => {
@@ -136,15 +142,16 @@ rtc.client.on("stream-added", function (evt) {
   console.log("stream-added remote-uid: ", id);
 });
 rtc.client.on("stream-subscribed", function (evt) {
-  // does this get invoked when another person enters?
   let remoteStream = evt.stream;
   let id = remoteStream.getId();
   addView(id);
   remoteStream.play("remote_video_" + id);
   rtc.remoteStreams.push(remoteStream);
+  console.log("in the stream subscribed method: " + rtc.remoteStreams.length);
   console.log("stream-subscribed remote-uid ", id);
+  document.getElementById("nickname_container_" + 
+      rtc.remoteStreams.length).innerHTML = "<h5>" + newID + "</h5>";
 });
-// when the stream is added, get the Id and subscribe
 rtc.client.on("stream-removed", function (evt) {
   let remoteStream = evt.stream;
   let id = remoteStream.getId();
@@ -177,13 +184,14 @@ function joinChannel(cname, videoOn) {
   document.getElementById("channel_name").innerHTML =
     "Current Room Name: " + cname;
   document.getElementById("nickname_").innerHTML = username;
+  document.getElementById("usermsg").placeholder = "Enter a Message to Send";
 
   rtc.client.join(option.token, channel_name, option.uid, function (uid) {
     rtc.params.uid = uid;
     rtc.localStream = AgoraRTC.createStream({
       // enable user permissions
       streamID: rtc.params.uid,
-      audio: !videoOn,
+      audio: true,
       video: !videoOn,
       screen: videoOn,
     });
@@ -209,16 +217,25 @@ function joinChannel(cname, videoOn) {
     .catch((error) => {
       console.log("Failed to Join Messaging Channel.");
     });
-  // when user receives a channel message
-  // text: text of the received channel message; senderId: user ID of the sender.
   RTMchannel.on("ChannelMessage", ({ text }, senderId) => {
     console.log("Message received: " + text);
     console.log("Sender ID = " + senderId);
     addMessageToView(text, senderId);
+    let msglog = document.getElementById("msg_log");
+    msglog.scrollTop = msglog.scrollHeight; // auto scrolling
+  });
+  // When someone joins the messaging channel
+  RTMchannel.on("MemberJoined", (memberId) => {
+    // check memberId is intended username
+    console.log(memberId + " has joined!");
+    console.log(rtc.remoteStreams.length);
+    newID = memberId;
+  });
+  RTMchannel.on("MemberLeft", (memberId) => {
+    console.log(memberId + " has left :( ");
   });
 }
 
-// when user wants to share their screen
 // turnOn = true, user is currently not sharing screen
 function shareScreen() {
   // if currently sharing screen, switch back to Share Screen
@@ -235,7 +252,7 @@ function shareScreen() {
   leaveChannel();
   setTimeout(() => {
     joinChannel(channel_name, isSharingScreen);
-  }, 1000);
+  }, 500);
 }
 
 function sendMessage() {
@@ -243,9 +260,12 @@ function sendMessage() {
   RTMchannel.sendMessage({ text: msg })
     .then(() => {
       addMessageToView(msg, username);
+      document.getElementById("usermsg").value = "";
+      let msglog = document.getElementById("msg_log");
+      msglog.scrollTop = msglog.scrollHeight; // auto scrolling
     })
     .catch((error) => {
-      console.log("Message failed to send.");
+      console.log("Message failed to send: " + error);
     });
 }
 
@@ -258,6 +278,8 @@ function leaveChannel() {
   document.getElementById("usermsg").disabled = true;
   document.getElementById("channel_name").innerHTML = "Current Room Name: ";
   document.getElementById("nickname_").innerHTML = "";
+  document.getElementById("usermsg").placeholder =
+    "Join a Room to Send Messages";
 
   // clears the message log
   document.getElementById("msg_log").innerHTML = "";
@@ -269,7 +291,7 @@ function leaveChannel() {
       rtc.localStream.close();
       while (rtc.remoteStreams.length > 0) {
         var remoteStream = rtc.remoteStreams.shift();
-        var id = remoteStream.getId();
+        let id = remoteStream.getId();
         if (remoteStream.isPlaying()) {
           remoteStream.stop();
         }
@@ -293,4 +315,5 @@ function onFormSubmit() {
     return false;
   }
   joinChannel(cname, false);
+  document.getElementById("cname").value = "";
 }

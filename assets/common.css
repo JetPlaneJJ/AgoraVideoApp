@@ -9118,7 +9118,7 @@ html, body {
 
 .agora-theme .agora-primary-bg {
   color: #fff;
-  background-color: #7DC2AD !important;
+  background-color: rgb(100, 177, 154) !important;
   align-items: center; }
 
 .agora-theme .card.container {

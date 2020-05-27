@@ -1,0 +1,11 @@
+Updated: 5/21/2020 
+
+1. (might have fixed this by always setting audio = true) Audio cannot be heard from screensharer
+2. Display Names are duplicated 
+3. (FIXED) Clear the message from the chat log --> causes confusion over whether msg sent
+4. (FIXED) Make the input hints more contrasted —> but still have it be gray
+5. (FIXED) auto scroll chat!!!
+
+Pros: 
+- Green color is nice on the eyes
+- 

@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body class="agora-theme">
-    <div class="navbar-fixed">
+    <article class="navbar-fixed">
       <nav class="agora-navbar">
         <div class="nav-wrapper agora-primary-bg">
           <h5
@@ -28,7 +28,7 @@
           </h5>
         </div>
       </nav>
-    </div>
+    </article>
     <!-- Main Content -->
     <div>
       <div class="card" style="margin-top: 20px;">
@@ -41,7 +41,8 @@
             "
           >
             <span>
-              <h5 id="channel_name" style="font-size: 20px;">Current Room:</h5> 
+              <h5 id="display_name" style="font-size: 20px;">Current Display Name: </h5>
+              <h5 id="channel_name" style="font-size: 20px;">Current Room Name:</h5> 
             </span>
             <span>
               <form
@@ -76,10 +77,10 @@
           </div>
         </div>
       </div>
-      <div style="display: flex;">
-        <!-- local stream, will add additional video cells dynamically -->
-        <div class="video-grid video-container" id="video" style="width: 80%; margin-left: 15px;">
-          <div class="video-view">
+      <article style="display: flex;">
+        <!-- local stream -->
+        <section id="video" class="video-grid video-container" style="width: 80%; margin-left: 15px;">
+          <section class="video-view">
             <div id="nickname_container_" class="agora-primary-bg">
               <h5
                 id = "nickname_"
@@ -90,10 +91,13 @@
             <div id="local_stream" class="video-placeholder"></div>
             <div id="local_video_info" class="video-profile hide"></div>
             <div id="video_autoplay_local" class="autoplay-fallback hide"></div>
-          </div>
-        </div>
+          </section>
+
+          <!-- add streams here, format =  Section > Div (h5), Div, Div... --> 
+
+        </section>
         <!-- Container for share button and chat log -->
-        <div id="chatlog" style="height: 560px">
+        <section id="chatlog" style="height: 560px">
           <button
               type="submit"
               onclick="shareScreen();"
@@ -105,10 +109,12 @@
           </button> 
           <div id="msg_log" style="overflow:scroll; height: 410px;">
 
+            <!-- add messages here -->
+
           </div>
           <form name="message" action="" style="width: 370px; padding-left: 10px;">
             <input type="text" 
-              placeholder="Enter a Message to Send" 
+              placeholder="Join a Room to Send Messages" 
               id="usermsg"
               maxlength="50"
               onsubmit="sendMessage(); return false;"
@@ -123,8 +129,8 @@
               Send
             </button>
           </form>
-        </div>
-      </div>
+        </section>
+      </article>
     </div>
     <!-- useful scripts, jQuery, helpful functions and agora SDK -->
     <script src="vendor/materialize.min.js"></script>
