@@ -1,5 +1,5 @@
 # AgoraVideoApp
-Code for DubsTech web video app workshop
+Video conferencing web app using Agora.io and Microsoft Azure Cognitive Services API
 
 ## Note as of June 03, 2020
 - Speech to Text fully implemented into chat
