@@ -40,11 +40,15 @@ function enableSpeechText() {
     recognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
     recognizer.recognizing = (s, e) => {
         console.log(`RECOGNIZING: Text=${e.result.text}`);
+        let message = username + ": " + e.result.text;
+        phraseDiv.innerHTML += "<h6>" + message + "</h6>";
+        document.getElementById("usermsg").value = e.result.text;
+        sendMessage();
     };
+    // TODO: figure whhy recognized is never called?
     recognizer.recognized = (s, e) => {
     if (e.result.reason == ResultReason.RecognizedSpeech) {
         console.log(`RECOGNIZED: Text=${e.result.text}`);
-        phraseDiv.innerHTML += "<h6>" + username + ": " + e.result.text + "</h6>";
     } else if (e.result.reason == ResultReason.NoMatch) {
         console.log("NOMATCH: Speech could not be recognized.");
     }

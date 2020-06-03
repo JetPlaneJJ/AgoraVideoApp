@@ -198,6 +198,7 @@ function toggleEnable(bool) {
   document.getElementById("startSpeechToText").disabled = bool;
   document.getElementById("leave").disabled = bool;
   document.getElementById("join").disabled = !bool;
+  document.getElementById("cname").disabled = !bool;
 }
 
 /** Handles functionality for joining a channel.
@@ -215,7 +216,7 @@ function joinChannel(cname, videoOn) {
   document.getElementById("nickname_").innerHTML = username;
   document.getElementById("usermsg").placeholder = "Enter a Message to Send";
 
-  // Joining with Video
+  // User joining with Video or Screen depending on videoOn
   rtc.client.join(option.token, channel_name, option.uid, function (uid) {
     rtc.params.uid = uid;
     rtc.localStream = AgoraRTC.createStream({
@@ -239,7 +240,8 @@ function joinChannel(cname, videoOn) {
       }
     );
   });
-  RTMchannel = RTMclient.createChannel(channel_name); // messaging channel same as video
+  // Real Time Messaging Channel
+  RTMchannel = RTMclient.createChannel(channel_name);
   RTMchannel.join()
     .then(() => {
       console.log("Joined Messaging Channel: " + channel_name);
@@ -247,6 +249,8 @@ function joinChannel(cname, videoOn) {
     .catch((error) => {
       console.log("Failed to Join Messaging Channel.");
     });
+
+  // Handles receiving messages from peers in the same channel
   RTMchannel.on("ChannelMessage", ({ text }, senderId) => {
     console.log("Message received: " + text);
     console.log("Sender ID = " + senderId);
@@ -289,6 +293,7 @@ function sendMessage() {
     })
     .catch((error) => {
       console.log("Message failed to send: " + error);
+      addMessageToView("(Message failed to send. Try leaving and re-entering the room.)", "System");
     });
 }
 
