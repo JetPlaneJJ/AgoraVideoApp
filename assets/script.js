@@ -1,7 +1,7 @@
 /**
   Name: Jay Lin
   Last Updated: 05.21.2020  
-  Script for handling Agora's RTM and RTC client as well as other website
+  This is the script for handling Agora's RTM and RTC client as well as other website
   functionality.
 **/
 
@@ -19,9 +19,9 @@ var rtc = {
   remoteStreams: [], //An array of remote video streams
   params: {}, //Any params we may want to pass to Agora
 };
-var RTMchannel;
-var option = {
-  // Options for joining a channel
+var RTMchannel; // channel for Real Time Messaging
+// Options for joining a channel
+var option = { 
   appID: "e435e4e68cb94a26900f3fbffee5ef09",
   channel: "Mystery Room", // chat rooms
   uid: 0, // tells agora "we don't have our own user id, make one for us"
@@ -171,14 +171,19 @@ rtc.client.on("peer-leave", function (evt) {
 });
 
 /** functions */
+function toggleEnable(bool) {
+  document.getElementById("share").disabled = bool;
+  document.getElementById("submitmsg").disabled = bool;
+  document.getElementById("usermsg").disabled = bool;
+  document.getElementById("startSpeechToText").disabled = bool;
+}
+
 function joinChannel(cname, videoOn) {
   console.log("Joined rtc channel: " + cname);
   channel_name = cname;
 
   // re-enable all buttons
-  document.getElementById("share").disabled = false;
-  document.getElementById("submitmsg").disabled = false;
-  document.getElementById("usermsg").disabled = false;
+  toggleEnable(false); // pass in false to make .disabled false
 
   // display channel name, checking if first person or not
   document.getElementById("channel_name").innerHTML =
@@ -237,18 +242,12 @@ function joinChannel(cname, videoOn) {
 }
 
 // turnOn = true, user is currently not sharing screen
+// if currently sharing screen, switch back to Share Screen
 function shareScreen() {
-  // if currently sharing screen, switch back to Share Screen
   isSharingScreen
     ? (document.getElementById("share").innerHTML = "Share Your Screen")
     : (document.getElementById("share").innerHTML = "Disable Screenshare");
   isSharingScreen = !isSharingScreen;
-  console.log(
-    "Toggling sharing screen from " +
-      !isSharingScreen +
-      " to " +
-      isSharingScreen
-  );
   leaveChannel();
   setTimeout(() => {
     joinChannel(channel_name, isSharingScreen);
@@ -273,9 +272,7 @@ function leaveChannel() {
   console.log("Left Video Channel");
 
   // disables all channel-related buttons
-  document.getElementById("share").disabled = true;
-  document.getElementById("submitmsg").disabled = true;
-  document.getElementById("usermsg").disabled = true;
+  toggleEnable(true);
   document.getElementById("channel_name").innerHTML = "Current Room Name: ";
   document.getElementById("nickname_").innerHTML = "";
   document.getElementById("usermsg").placeholder =
@@ -310,7 +307,7 @@ function leaveChannel() {
 
 function onFormSubmit() {
   let cname = document.getElementById("cname").value;
-  if (!cname || cname.length > 20 || cname.length < 1) {
+  if (!cname || cname.length > 20 || cname.length < 1 || cname == "`") {
     alert("Invalid room name. Please try again.");
     return false;
   }

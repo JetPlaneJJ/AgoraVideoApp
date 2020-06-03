@@ -13,11 +13,12 @@ h5 {
 }
 
 .btn {
-  background-color: black;
+  background-color: white;
 }
 
-.btn:hover {
+.btn:hover, .btn:focus {
   color: black;
+  background-color: black;
 }
 
 .container {
@@ -28,17 +29,20 @@ h5 {
   border-style: solid;
   border-color: #7dc2ad;
   box-shadow: 5px 5px 5px grey;
+  width: 80%;
+  margin-left: 15px;
+  margin-bottom: 15px;
 }
 
 #chatlog {
   height: 480px;
+  width: 400px;
   border-style: solid;
   border-color: #7dc2ad;
   box-shadow: 5px 5px 5px grey;
   text-align: right;
-  width: 450px;
   margin-left: 20px;
-  margin-right: 10px;
+  margin-right: 15px;
 }
 
 #msg_log {

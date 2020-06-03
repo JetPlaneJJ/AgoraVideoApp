@@ -15,7 +15,20 @@
     <title>Mystery Video App</title>
     <link rel="stylesheet" href="./assets/common.css" />
     <link rel="stylesheet" href="css/style.css" />
+
+    <!-- Scripts -->
+    <script src="vendor/materialize.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.agora.io/sdk/release/AgoraRTCSDK-3.0.0.js"></script>
+    <script src="assets/agora-rtm-sdk-1.2.2.js"></script>
+    <!-- <script src="microsoft.cognitiveservices.speech.sdk.bundle.js"></script> -->
+    <script src="assets/script.js"></script>
+
   </head>
+  <!-- <speechsdkref> -->
+  <!-- Speech SDK reference sdk. -->
+  <script src="microsoft.cognitiveservices.speech.sdk.bundle.js"></script>
+  <!-- </speechsdkref> -->
   <body class="agora-theme">
     <article class="navbar-fixed">
       <nav class="agora-navbar">
@@ -41,12 +54,17 @@
             "
           >
             <span>
-              <h5 id="display_name" style="font-size: 20px;">Current Display Name: </h5>
-              <h5 id="channel_name" style="font-size: 20px;">Current Room Name:</h5> 
+              <h5 id="display_name" style="font-size: 20px;">
+                Current Display Name:
+              </h5>
+              <h5 id="channel_name" style="font-size: 20px;">
+                Current Room Name:
+              </h5>
             </span>
             <span>
               <form
-                id="form" style="width: 200px;"
+                id="form"
+                style="width: 200px;"
                 onsubmit="onFormSubmit(); return false;"
               >
                 <input
@@ -79,64 +97,135 @@
       </div>
       <article style="display: flex;">
         <!-- local stream -->
-        <section id="video" class="video-grid video-container" style="width: 80%; margin-left: 15px;">
+        <div
+          id="video"
+          class="video-grid video-container"
+        >
           <section class="video-view">
-            <div id="nickname_container_" class="agora-primary-bg">
-              <h5
-                id = "nickname_"
-                class="left-align username-bar"
-              >
-              </h5>
+            <!-- TODO: fix this nickname functionality -->
+            <div
+              id="nickname_container_"
+              class="agora-primary-bg"
+              style="display: none;"
+            >
+              <h5 id="nickname_" class="left-align username-bar"></h5>
             </div>
             <div id="local_stream" class="video-placeholder"></div>
             <div id="local_video_info" class="video-profile hide"></div>
             <div id="video_autoplay_local" class="autoplay-fallback hide"></div>
           </section>
 
-          <!-- add streams here, format =  Section > Div (h5), Div, Div... --> 
-
-        </section>
-        <!-- Container for share button and chat log -->
-        <section id="chatlog" style="height: 560px">
+          <!-- add streams here, format =  Section > Div (h5), Div, Div... -->
+        </div>
+        <!-- Container for share screen button and chat log -->
+        <section id="chatlog" style="height: 450px;">
           <button
-              type="submit"
-              onclick="shareScreen();"
-              class="btn btn-raised btn-primary waves-effect waves-light"
-              id="share"
-              disabled
-            >
-            Share Your Screen 
-          </button> 
-          <div id="msg_log" style="overflow:scroll; height: 410px;">
-
+            type="submit"
+            onclick="shareScreen();"
+            class="btn btn-raised btn-primary waves-effect waves-light"
+            id="share"
+            disabled
+          >
+            Share Your Screen
+          </button>
+          <div id="msg_log" style="overflow: scroll; height: 300px;">
             <!-- add messages here -->
-
           </div>
-          <form name="message" action="" style="width: 370px; padding-left: 10px;">
-            <input type="text" 
-              placeholder="Join a Room to Send Messages" 
+          <form
+            name="message"
+            action=""
+            style="width: 370px; padding-left: 10px; padding-right: 10px;"
+          >
+            <input
+              type="text"
+              placeholder="Join a Room to Send Messages"
               id="usermsg"
               maxlength="50"
               onsubmit="sendMessage(); return false;"
               disabled
-              />
-            <button 
-              class="btn btn-raised btn-primary waves-effect waves-light" 
-              type="submit" id="submitmsg"
-              onclick="sendMessage(); return false;"
-              disabled
+            />
+            <div style="display: flex; justify-content: space-between;">
+              <button
+                class="btn btn-raised btn-primary waves-effect waves-light"
+                type="submit"
+                id="startSpeechToText"
+                disabled
+                style="padding-bottom: 10px;"
               >
-              Send
-            </button>
+                Enable Speech-To-Text
+              </button>
+              <!-- Send Message Button -->
+              <button
+                class="btn btn-raised btn-primary waves-effect waves-light"
+                type="submit"
+                id="submitmsg"
+                onclick="sendMessage(); return false;"
+                disabled
+              >
+                Send
+              </button>
+            </div>
           </form>
         </section>
       </article>
     </div>
-    <!-- useful scripts, jQuery, helpful functions and agora SDK -->
-    <script src="vendor/materialize.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://cdn.agora.io/sdk/release/AgoraRTCSDK-3.0.0.js"></script>
-    <script src="assets/agora-rtm-sdk-1.2.2.js"></script>
-    <script src="assets/script.js"></script>
   </body>
+  <!-- <script type="module" src="assets/speech-to-text.js"></script> -->
+  <script>
+    // status fields and start button in UI
+    var phraseDiv;
+    var startRecognizeOnceAsyncButton;
+
+    // subscription key and region for speech services.
+    var subscriptionKey, serviceRegion;
+    var authorizationToken;
+    var SpeechSDK;
+    var recognizer;
+
+    document.addEventListener("DOMContentLoaded", function () {
+      startB = document.getElementById("startSpeechToText");
+      phraseDiv = document.getElementById("msg_log");
+
+      startB.addEventListener("click", function () {
+        startB.disabled = true;
+
+        // if we got an authorization token, use the token. Otherwise use the provided subscription key
+        let speechConfig;
+        speechConfig = SpeechSDK.SpeechConfig.fromSubscription(
+          'd3d083cb751b4fb2ba568ba373d4c43f', 
+          'westus2');
+        speechConfig.speechRecognitionLanguage = "en-US";
+        let audioConfig  = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
+        recognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
+
+        recognizer.recognizeOnceAsync(
+          function (result) {
+            startB.disabled = false;
+            phraseDiv.innerHTML += username + ": " + result.text;
+            window.console.log(result.text);
+
+            recognizer.close();
+            recognizer = undefined;
+          },
+          function (err) {
+            startRecognizeOnceAsyncButton.disabled = false;
+            phraseDiv.innerHTML += err;
+            window.console.log(err);
+
+            recognizer.close();
+            recognizer = undefined;
+          });
+      });
+
+      if (!!window.SpeechSDK) {
+        SpeechSDK = window.SpeechSDK;
+        startB.disabled = false;
+
+        // in case we have a function for getting an authorization token, call it.
+        if (typeof RequestAuthorizationToken === "function") {
+            RequestAuthorizationToken();
+        }
+      }
+    });
+  </script>
 </html>
