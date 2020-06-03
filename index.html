@@ -88,6 +88,8 @@
                 class="btn btn-raised btn-primary waves-effect waves-light"
                 style="margin-left: 10px; margin-right: 10px;"
                 id="leave"
+                onclick="leaveChannel()"
+                disabled
               >
                 LEAVE
               </button>
@@ -135,41 +137,53 @@
             name="message"
             action=""
             style="width: 370px; padding-left: 10px; padding-right: 10px;"
+            onsubmit="sendMessage(); return false;"
           >
             <input
               type="text"
               placeholder="Join a Room to Send Messages"
               id="usermsg"
-              maxlength="50"
-              onsubmit="sendMessage(); return false;"
+              maxlength="100"
               disabled
             />
-            <div style="display: flex; justify-content: space-between;">
-              <button
-                class="btn btn-raised btn-primary waves-effect waves-light"
-                type="submit"
-                id="startSpeechToText"
-                onclick="enableSpeechText()"
-                
-                style="padding-bottom: 10px;"
-              >
-                Enable Speech-To-Text
-              </button>
-              <!-- Send Message Button -->
-              <button
-                class="btn btn-raised btn-primary waves-effect waves-light"
-                type="submit"
-                id="submitmsg"
-                onclick="sendMessage(); return false;"
-                disabled
-              >
-                Send
-              </button>
-            </div>
           </form>
+          <div style="display: flex; 
+            justify-content: space-between; 
+            margin-left: 10px;
+            margin-right: 10px;">
+            <button
+              class="btn btn-raised btn-primary waves-effect waves-light"
+              type="submit"
+              id="startSpeechToText"
+              onclick="enableSpeechText()"
+              disabled
+            >
+              Enable Speech-To-Text
+            </button>
+            <button
+              class="btn btn-raised btn-primary waves-effect waves-light"
+              type="submit"
+              id="endSpeechToText"
+              onclick="disableSpeechText()"
+              style="display: none"
+              disabled
+            >
+              Disable Speech-To-Text
+            </button>
+            <!-- Send Message Button -->
+            <button
+              class="btn btn-raised btn-primary waves-effect waves-light"
+              type="submit"
+              id="submitmsg"
+              onclick="sendMessage(); return false;"
+              disabled
+            >
+              Send
+            </button>
+          </div>
         </section>
       </article>
     </div>
   </body>
-  <script src="assets/speech-to-text.js"></script> -->
+  <script src="assets/speech-to-text.js"></script>
 </html>

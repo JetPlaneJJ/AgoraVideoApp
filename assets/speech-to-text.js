@@ -1,30 +1,40 @@
 /**
   Name: Jay Lin
-  Last Updated: 05.02.2020
-  This is the script for handling speech to text recognition.
-  Code taken from official tutorial on Microsoft Build's website: 
-  https://docs.microsoft.com/en-us/javascript/api/overview/azure/speech-service?view=azure-node-latest
+  Last Updated: 06.03.2020
+  Script for handling speech to text recognition using Microsoft Cognitive Services.
 **/
+
 var SpeechSDK;
 var recognizer;
-var isClicked = false;
-var startB = document.getElementById("startSpeechToText");
-var phraseDiv = document.getElementById("msg_log");
+const startB = document.getElementById("startSpeechToText");
+const endB = document.getElementById("endSpeechToText");
+const phraseDiv = document.getElementById("msg_log");
 var speechConfig = SpeechSDK.SpeechConfig.fromSubscription(
         "d3d083cb751b4fb2ba568ba373d4c43f",
         "westus2"
 );
 speechConfig.speechRecognitionLanguage = "en-US";
 
-function enableSpeechText() {
-    isClicked
-        ? (document.getElementById("startSpeechToText").innerHTML =
-            "Enable Speech-To-Text")
-        : (document.getElementById("startSpeechToText").innerHTML =
-            "Disable Speech-To-Text");
+/** Toggles appearance and functionality of Speech-To-Text buttons.
+ * @param {boolean} bool - Is true if the start speech-to-text button 
+ *      should be disabled, and vice versa for the end button.
+ */
+function toggleSpeechToTextButtons(bool) {
+    startB.disabled = bool;
+    endB.disabled = !bool;
+    if (bool) {
+        startB.style.display = "none";
+        endB.style.display = "block";
+    }
+    else {
+        startB.style.display = "block";
+        endB.style.display = "none";
+    }
+}
 
-    isClicked = !isClicked;
-    // if we got an authorization token, use the token. Otherwise use the provided subscription key
+// Enables Speech-To-Text functionality for chat messages while user is inside a Room.
+function enableSpeechText() {
+    toggleSpeechToTextButtons(true);
 
     let audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
     recognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
@@ -41,19 +51,19 @@ function enableSpeechText() {
     };
     recognizer.canceled = (s, e) => {
         console.log(`CANCELED: Reason=${e.reason}`);
-        recognizer.stopContinuousRecognitionAsync();
+        // recognizer.stopContinuousRecognitionAsync();
     };
     recognizer.sessionStopped = (s, e) => {
         console.log("\n Session stopped event.");
-        startB.disabled = true;
-        recognizer.stopContinuousRecognitionAsync();
+        // recognizer.stopContinuousRecognitionAsync();
     };
-    if (isClicked) {
-        console.log("\n Started Recog.");
-        recognizer.startContinuousRecognitionAsync();
-    } else {
-        console.log("\n Stopped Recog.");
-        recognizer.stopContinuousRecognitionAsync();
-    }
-    startB.disabled = true;
+    recognizer.startContinuousRecognitionAsync();
+    console.log("\n Started Recog.");
+}
+
+// Disables Speech-To-Text functionality.
+function disableSpeechText() {
+    toggleSpeechToTextButtons(false);
+    recognizer.stopContinuousRecognitionAsync();
+    console.log("\n Stopped Recog.");
 }
