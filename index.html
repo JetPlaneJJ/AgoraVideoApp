@@ -149,7 +149,8 @@
                 class="btn btn-raised btn-primary waves-effect waves-light"
                 type="submit"
                 id="startSpeechToText"
-                disabled
+                onclick="enableSpeechText()"
+                
                 style="padding-bottom: 10px;"
               >
                 Enable Speech-To-Text
@@ -170,62 +171,5 @@
       </article>
     </div>
   </body>
-  <!-- <script type="module" src="assets/speech-to-text.js"></script> -->
-  <script>
-    // status fields and start button in UI
-    var phraseDiv;
-    var startRecognizeOnceAsyncButton;
-
-    // subscription key and region for speech services.
-    var subscriptionKey, serviceRegion;
-    var authorizationToken;
-    var SpeechSDK;
-    var recognizer;
-
-    document.addEventListener("DOMContentLoaded", function () {
-      startB = document.getElementById("startSpeechToText");
-      phraseDiv = document.getElementById("msg_log");
-
-      startB.addEventListener("click", function () {
-        startB.disabled = true;
-
-        // if we got an authorization token, use the token. Otherwise use the provided subscription key
-        let speechConfig;
-        speechConfig = SpeechSDK.SpeechConfig.fromSubscription(
-          'd3d083cb751b4fb2ba568ba373d4c43f', 
-          'westus2');
-        speechConfig.speechRecognitionLanguage = "en-US";
-        let audioConfig  = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
-        recognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
-
-        recognizer.recognizeOnceAsync(
-          function (result) {
-            startB.disabled = false;
-            phraseDiv.innerHTML += username + ": " + result.text;
-            window.console.log(result.text);
-
-            recognizer.close();
-            recognizer = undefined;
-          },
-          function (err) {
-            startRecognizeOnceAsyncButton.disabled = false;
-            phraseDiv.innerHTML += err;
-            window.console.log(err);
-
-            recognizer.close();
-            recognizer = undefined;
-          });
-      });
-
-      if (!!window.SpeechSDK) {
-        SpeechSDK = window.SpeechSDK;
-        startB.disabled = false;
-
-        // in case we have a function for getting an authorization token, call it.
-        if (typeof RequestAuthorizationToken === "function") {
-            RequestAuthorizationToken();
-        }
-      }
-    });
-  </script>
+  <script src="assets/speech-to-text.js"></script> -->
 </html>
