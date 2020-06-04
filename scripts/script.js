@@ -109,7 +109,7 @@ $(document).ready(function () {
   username = input;
   user_msg_id = username;
   document.getElementById("display_name").innerHTML =
-    "Current Display Name: " + input;
+    "Username: " + input;
   // login as a client of Real time Messaging
   RTMclient.login({ token: null, uid: "" + user_msg_id })
     .then(() => {
@@ -212,7 +212,7 @@ function joinChannel(cname, videoOn) {
   toggleEnable(false);
 
   document.getElementById("channel_name").innerHTML =
-    "Current Room Name: " + cname;
+    "Room Name: " + cname;
   document.getElementById("nickname_").innerHTML = username;
   document.getElementById("usermsg").placeholder = "Enter a Message to Send";
 
@@ -306,7 +306,7 @@ function leaveChannel() {
   }
   console.log("Left Video Channel");
   toggleEnable(true);
-  document.getElementById("channel_name").innerHTML = "Current Room Name: ";
+  document.getElementById("channel_name").innerHTML = "Room Name: ";
   document.getElementById("nickname_").innerHTML = "";
   document.getElementById("usermsg").placeholder =
     "Join a Room to Send Messages";

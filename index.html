@@ -13,16 +13,17 @@
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
     <title>Mystery Video App</title>
-    <link rel="stylesheet" href="./assets/common.css" />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="external-assets/common.css" />
     <link rel="stylesheet" href="css/style.css" />
 
     <!-- Scripts -->
     <script src="vendor/materialize.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdn.agora.io/sdk/release/AgoraRTCSDK-3.0.0.js"></script>
-    <script src="assets/agora-rtm-sdk-1.2.2.js"></script>
-    <!-- <script src="microsoft.cognitiveservices.speech.sdk.bundle.js"></script> -->
-    <script src="assets/script.js"></script>
+    <script src="external-assets/agora-rtm-sdk-1.2.2.js"></script>
+    <script src="scripts/script.js"></script>
 
   </head>
   <!-- <speechsdkref> -->
@@ -44,27 +45,20 @@
     </article>
     <!-- Main Content -->
     <div>
-      <div class="card" style="margin-top: 20px;">
-        <div class="row card-content" style="height: auto;">
-          <div
-            style="
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-            "
-          >
-            <span>
-              <h5 id="display_name" style="font-size: 20px;">
-                Current Display Name:
+      <div class="card">
+        <div class="row card-content">
+          <div id = cardbar>
+            <span id="detailspan">
+              <h5 class="details" id="display_name">
+                Username:
               </h5>
-              <h5 id="channel_name" style="font-size: 20px;">
-                Current Room Name:
+              <h5 class="details" id="channel_name">
+                Room Name:
               </h5>
             </span>
-            <span>
+            <span id="formspan">
               <form
                 id="form"
-                style="width: 200px;"
                 onsubmit="onFormSubmit(); return false;"
               >
                 <input
@@ -74,13 +68,12 @@
                 />
               </form>
             </span>
-            <span>
+            <span id="joinAndLeave">
               <button
                 type="submit"
                 onclick="onFormSubmit(); return false;"
                 class="btn btn-raised btn-primary waves-effect waves-light"
                 id="join"
-                style="margin-left: 10px; margin-right: 10px;"
               >
                 JOIN
               </button>
@@ -97,7 +90,7 @@
           </div>
         </div>
       </div>
-      <article style="display: flex;">
+      <article style="display: flex;" id="main-content">
         <!-- local stream -->
         <div
           id="video"
@@ -120,7 +113,7 @@
           <!-- add streams here, format =  Section > Div (h5), Div, Div... -->
         </div>
         <!-- Container for share screen button and chat log -->
-        <section id="chatlog" style="height: 450px;">
+        <section id="chatlog">
           <button
             type="submit"
             onclick="shareScreen();"
@@ -130,13 +123,12 @@
           >
             Share Your Screen
           </button>
-          <div id="msg_log" style="overflow: scroll; height: 300px;">
+          <div id="msg_log">
             <!-- add messages here -->
           </div>
           <form
             name="message"
             action=""
-            style="width: 370px; padding-left: 10px; padding-right: 10px;"
             onsubmit="sendMessage(); return false;"
           >
             <input
@@ -184,6 +176,6 @@
         </section>
       </article>
     </div>
+    <script src="scripts/speech-to-text.js"></script>
   </body>
-  <script src="assets/speech-to-text.js"></script>
 </html>
