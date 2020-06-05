@@ -109,11 +109,13 @@ $(document).ready(function () {
   username = input;
   user_msg_id = username;
   document.getElementById("display_name").innerHTML =
-    "Username: " + input;
+    "Username: <strong>" + input + "</strong>";
   // login as a client of Real time Messaging
   RTMclient.login({ token: null, uid: "" + user_msg_id })
     .then(() => {
       console.log("AgoraRTM client login success: userID = " + user_msg_id);
+      setTimeout(function() { 
+        console.log("joined") }, 1000);
     })
     .catch((err) => {
       console.log("AgoraRTM client login failure", err);
@@ -207,12 +209,12 @@ function toggleEnable(bool) {
  *    disable screen share.
  */
 function joinChannel(cname, videoOn) {
-  console.log("Joined rtc channel: " + cname);
+  console.log("Joined rtc channel: " + cname + " with videoOn: " + videoOn);
   channel_name = cname;
   toggleEnable(false);
 
   document.getElementById("channel_name").innerHTML =
-    "Room Name: " + cname;
+    "Room Name: <strong>" + cname + "</strong>";
   document.getElementById("nickname_").innerHTML = username;
   document.getElementById("usermsg").placeholder = "Enter a Message to Send";
 
@@ -272,13 +274,27 @@ function joinChannel(cname, videoOn) {
 
 // Handles functionality for sharing user screen and toggling share butotn.
 function shareScreen() {
-  isSharingScreen
-    ? (document.getElementById("share").innerHTML = "Share Your Screen")
-    : (document.getElementById("share").innerHTML = "Share Your Video");
+  console.log("SHARING SCREEN " + isSharingScreen);
+  document.getElementById("share").disabled = true;
+  document.getElementById("unshare").disabled = false;
+  document.getElementById("share").style.display = "none";
+  document.getElementById("unshare").style.display = "block";
   leaveChannel();
   setTimeout(function() { 
-    joinChannel(channel_name, !isSharingScreen); }, 1000);
-  isSharingScreen = !isSharingScreen; // switching from not sharing to sharing
+    joinChannel(channel_name, true); 
+  }, 1000);
+}
+
+function unshareScreen() {
+  console.log("UNSHARING SCREEN " + false);
+  document.getElementById("share").disabled = false;
+  document.getElementById("unshare").disabled = true;
+  document.getElementById("share").style.display = "block";
+  document.getElementById("unshare").style.display = "none";
+  leaveChannel();
+  setTimeout(function() { 
+    joinChannel(channel_name, false); 
+  }, 1000);
 }
 
 // Sends a message to peers and adds message to chat log.
@@ -300,6 +316,12 @@ function sendMessage() {
 // Leaves the channel and clears all channel-related content.
 function leaveChannel() {
   // if you click leave while still sharing your video, reset appearance
+  try {
+    disableSpeechText();
+  }
+  catch(err) {
+    console.log("Unable to disable speechText or was not enabling speechText.")
+  }
   if (isSharingScreen) {
     document.getElementById("share").innerHTML = "Share Your Screen";
     isSharingScreen = false;
@@ -340,7 +362,7 @@ function onFormSubmit() {
     alert("Invalid or empty room name. Please use non-special characters.");
     return false;
   }
-  joinChannel(cname, false);
+  joinChannel(cname, isSharingScreen);
   document.getElementById("cname").value = "";
 }
 

@@ -88,6 +88,7 @@ h5 {
   margin-left: 10px;
   overflow: scroll;
   height: 300px;
+  width: 380px;
 }
 
 @media only screen and (max-width: 600px) {

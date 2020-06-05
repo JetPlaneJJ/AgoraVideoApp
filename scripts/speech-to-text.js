@@ -35,39 +35,30 @@ function toggleSpeechToTextButtons(bool) {
 // Enables Speech-To-Text functionality for chat messages while user is inside a Room.
 function enableSpeechText() {
     toggleSpeechToTextButtons(true);
-
     let audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
     recognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
-    recognizer.recognizing = (s, e) => {
-        console.log(`RECOGNIZING: Text=${e.result.text}`);
-        let message = username + ": " + e.result.text;
-        phraseDiv.innerHTML += "<h6>" + message + "</h6>";
-        document.getElementById("usermsg").value = e.result.text;
-        sendMessage();
-    };
-    // TODO: figure whhy recognized is never called?
-    recognizer.recognized = (s, e) => {
-    if (e.result.reason == ResultReason.RecognizedSpeech) {
-        console.log(`RECOGNIZED: Text=${e.result.text}`);
-    } else if (e.result.reason == ResultReason.NoMatch) {
-        console.log("NOMATCH: Speech could not be recognized.");
-    }
-    };
-    recognizer.canceled = (s, e) => {
-        console.log(`CANCELED: Reason=${e.reason}`);
-        // recognizer.stopContinuousRecognitionAsync();
-    };
-    recognizer.sessionStopped = (s, e) => {
-        console.log("\n Session stopped event.");
-        // recognizer.stopContinuousRecognitionAsync();
-    };
-    recognizer.startContinuousRecognitionAsync();
-    console.log("\n Started Recog.");
+
+    recognizer.recognizeOnceAsync(
+        function (result) {
+            if (result.text != "undefined") {
+                window.console.log(result);
+                document.getElementById("usermsg").value = result.text;
+                sendMessage();
+                disableSpeechText();
+            }
+        },
+        function (err) {
+            startRecognizeOnceAsyncButton.disabled = false;
+            phraseDiv.innerHTML += "Error: " + err + ". Could not recognize speech.";
+            window.console.log(err);
+            disableSpeechText();
+    });
 }
 
 // Disables Speech-To-Text functionality.
 function disableSpeechText() {
     toggleSpeechToTextButtons(false);
-    recognizer.stopContinuousRecognitionAsync();
+    recognizer.close();
+    recognizer = undefined;
     console.log("\n Stopped Recog.");
 }
