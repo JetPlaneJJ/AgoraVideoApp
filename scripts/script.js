@@ -8,6 +8,7 @@ var channel_name = ""; // name of channel user is currently in
 var newID = ""; // represents peer messager IDs
 var username = ""; // represents user's current username or display name
 var user_msg_id = ""; // represents user's current username for messaging
+var people_list = [];
 var isSharingScreen = false; 
 var rtc = {
   client: null, // video client
@@ -109,7 +110,7 @@ $(document).ready(function () {
   username = input;
   user_msg_id = username;
   document.getElementById("display_name").innerHTML =
-    "Username: <strong>" + input + "</strong>";
+    "<u>Username</u>: <strong>" + input + "</strong>";
   // login as a client of Real time Messaging
   RTMclient.login({ token: null, uid: "" + user_msg_id })
     .then(() => {
@@ -214,7 +215,7 @@ function joinChannel(cname, videoOn) {
   toggleEnable(false);
 
   document.getElementById("channel_name").innerHTML =
-    "Room Name: <strong>" + cname + "</strong>";
+    "<u>Room Name</u>: <strong>" + cname + "</strong>";
   document.getElementById("nickname_").innerHTML = username;
   document.getElementById("usermsg").placeholder = "Enter a Message to Send";
 
@@ -251,7 +252,7 @@ function joinChannel(cname, videoOn) {
     .catch((error) => {
       console.log("Failed to Join Messaging Channel.");
     });
-
+  updateMemberList();
   // Handles receiving messages from peers in the same channel
   RTMchannel.on("ChannelMessage", ({ text }, senderId) => {
     console.log("Message received: " + text);
@@ -266,10 +267,18 @@ function joinChannel(cname, videoOn) {
     console.log(memberId + " has joined!");
     console.log(rtc.remoteStreams.length);
     newID = memberId;
+    updateMemberList();
   });
   RTMchannel.on("MemberLeft", (memberId) => {
-    console.log(memberId + " has left :( ");
+    console.log(memberId + " has left.");
+    updateMemberList();
   });
+}
+
+// updates the list of members visible to RTM channel members
+function updateMemberList() {
+  people_list = RTMchannel.getMembers().toString(); // gets list of channel members
+  document.getElementById("people_list").innerHTML = "<u>People</u>: " + people_list.toString();
 }
 
 // Handles functionality for sharing user screen and toggling share butotn.
@@ -328,11 +337,12 @@ function leaveChannel() {
   }
   console.log("Left Video Channel");
   toggleEnable(true);
-  document.getElementById("channel_name").innerHTML = "Room Name: ";
+  document.getElementById("channel_name").innerHTML = "<u>Room Name</u>: ";
   document.getElementById("nickname_").innerHTML = "";
   document.getElementById("usermsg").placeholder =
     "Join a Room to Send Messages";
   document.getElementById("msg_log").innerHTML = ""; // clears the message log
+  document.getElementById("people_list").innerHTML = "<u>People</u>: ";
 
   rtc.client.leave(
     function () {

@@ -37,28 +37,39 @@ function enableSpeechText() {
     toggleSpeechToTextButtons(true);
     let audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
     recognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
-
-    recognizer.recognizeOnceAsync(
-        function (result) {
-            if (result.text != "undefined") {
-                window.console.log(result);
-                document.getElementById("usermsg").value = result.text;
-                sendMessage();
-                disableSpeechText();
-            }
-        },
-        function (err) {
-            startRecognizeOnceAsyncButton.disabled = false;
-            phraseDiv.innerHTML += "Error: " + err + ". Could not recognize speech.";
-            window.console.log(err);
-            disableSpeechText();
-    });
+    // recognizer.recognizeOnceAsync(
+    //     function (result) {
+    //         if (result.text != "undefined") {
+    //             window.console.log(result);
+    //             document.getElementById("usermsg").value = result.text;
+    //             sendMessage();
+    //             disableSpeechText();
+    //         }
+    //     },
+    //     function (err) {
+    //         startRecognizeOnceAsyncButton.disabled = false;
+    //         phraseDiv.innerHTML += "Error: " + err + ". Could not recognize speech.";
+    //         window.console.log(err);
+    //         disableSpeechText();
+    // });
+    recognizer.recognized = (s, e) => {
+        console.log(`RECOGNIZED: Text=${e.result.text}`);
+        if (e.result.text && e.result.text != "undefined" && e.result.text != "") {
+            document.getElementById("usermsg").value = e.result.text;
+            sendMessage();
+        }
+    };
+    recognizer.recognizing = (s, e) => {
+        console.log(`RECOGNIZING: Text=${e.result.text}`);
+    };
+    recognizer.startContinuousRecognitionAsync(()=>{}, (error)=>{});
 }
 
 // Disables Speech-To-Text functionality.
 function disableSpeechText() {
     toggleSpeechToTextButtons(false);
-    recognizer.close();
-    recognizer = undefined;
+    // recognizer.close();
+    // recognizer = undefined;
+    recognizer.stopContinuousRecognitionAsync();
     console.log("\n Stopped Recog.");
 }
