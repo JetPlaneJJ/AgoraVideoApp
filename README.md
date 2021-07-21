@@ -1,5 +1,7 @@
 # AgoraVideoApp
-Video conferencing web app using Agora.io and Microsoft Azure Cognitive Services API
+Video conferencing web app using Agora.io and Microsoft Azure Cognitive Services API.
+Please allow video camera/audio/screen recording permissions to be able to communicate with others via camera/audio/screensharing.
+Speech to Text chat messaging is supported.
 
 ## November 03, 2020
 - Potentially changing name to "Anonymous Cafe"? 
